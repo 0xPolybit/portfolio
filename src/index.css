@@ -11,21 +11,32 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  
+
   /* CSS variables for mouse position */
   --mouse-x: 50vw;
   --mouse-y: 50vh;
+
+  /* Text colors (tuned for WCAG AA contrast on the #0a0a0a background) */
+  --text-strong: rgba(255, 255, 255, 0.92);
+  --text-muted: rgba(255, 255, 255, 0.74);
+
+  /* Green accent + shared keyboard focus ring */
+  --accent-bg: rgba(100, 200, 100, 0.15);
+  --accent-border: rgba(100, 200, 100, 0.3);
+  --focus-ring: 0 0 0 3px rgba(80, 200, 140, 0.5);
 }
 
 * {
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   height: 100vh;
-  width: 100vw;
+  height: 100dvh; /* track dynamic viewport (mobile address bar) */
+  width: 100%;
   overflow: hidden; /* Remove scroll */
 }
 
@@ -36,8 +47,9 @@ body {
 }
 
 #root {
-  width: 100vw;
+  width: 100%;
   height: 100vh;
+  height: 100dvh;
 }
 
 h1 {

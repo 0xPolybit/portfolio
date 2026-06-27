@@ -17,13 +17,13 @@ function App() {
       const rect = container.getBoundingClientRect()
       const x = e.clientX - rect.left
       const y = e.clientY - rect.top
-      
+
       container.style.setProperty('--mouse-x', `${x}px`)
       container.style.setProperty('--mouse-y', `${y}px`)
     }
 
     container.addEventListener('mousemove', handleMouseMove)
-    
+
     return () => {
       container.removeEventListener('mousemove', handleMouseMove)
     }
@@ -32,46 +32,43 @@ function App() {
   useEffect(() => {
     // create audio element that points to public/pronounciation.mp3
     const audio = new Audio('/pronounciation.mp3')
-    audio.preload = 'auto'
+    audio.preload = 'metadata'
     audioRef.current = audio
 
-    const onEnded = () => setIsPlaying(false)
-    const onPause = () => setIsPlaying(false)
-    audio.addEventListener('ended', onEnded)
-    audio.addEventListener('pause', onPause)
+    // Drive isPlaying from the audio element so it stays the source of truth
+    const onPlay = () => setIsPlaying(true)
+    const onStop = () => setIsPlaying(false)
+    audio.addEventListener('play', onPlay)
+    audio.addEventListener('pause', onStop)
+    audio.addEventListener('ended', onStop)
 
     return () => {
-      audio.removeEventListener('ended', onEnded)
-      audio.removeEventListener('pause', onPause)
+      audio.removeEventListener('play', onPlay)
+      audio.removeEventListener('pause', onStop)
+      audio.removeEventListener('ended', onStop)
       audio.pause()
       audioRef.current = null
     }
   }, [])
 
-  // Handle section navigation with smooth animation
+  // Handle section navigation with smooth animation.
+  // The actual translate (and its vh/dvh fallback) lives in CSS; we just
+  // expose the active index so the math works on any viewport-height unit.
   const navigateToSection = (sectionIndex: number) => {
     setActiveSection(sectionIndex)
-    const sectionsContainer = sectionsRef.current
-    if (sectionsContainer) {
-      const targetY = -sectionIndex * 100 // Each section is 100vh
-      sectionsContainer.style.transform = `translateY(${targetY}vh)`
-    }
+    sectionsRef.current?.style.setProperty('--active-section', String(sectionIndex))
   }
 
   return (
     <div ref={containerRef} className="app-container">
       <div className="grid-background"></div>
-      
+
       {/* Navigation */}
       <NavigationButtons activeSection={activeSection} onNavigate={navigateToSection} />
-      
+
       {/* Sections Container */}
       <div ref={sectionsRef} className="sections-container">
-        <AboutSection 
-          audioRef={audioRef} 
-          isPlaying={isPlaying} 
-          setIsPlaying={setIsPlaying} 
-        />
+        <AboutSection audioRef={audioRef} isPlaying={isPlaying} setIsPlaying={setIsPlaying} />
         <ExperienceSection />
         <ProjectsSection />
         <ContactSection />
@@ -82,30 +79,44 @@ function App() {
 
 function USFlag() {
   return (
-    <svg width="28" height="20" viewBox="0 0 19 12" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-      <rect width="19" height="14" fill="#b22234"/>
+    <svg
+      width="28"
+      height="20"
+      viewBox="0 0 19 12"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <rect width="19" height="14" fill="#b22234" />
       <g fill="#fff">
-        <rect y="1" width="19" height="1"/>
-        <rect y="3" width="19" height="1"/>
-        <rect y="5" width="19" height="1"/>
-        <rect y="7" width="19" height="1"/>
-        <rect y="9" width="19" height="1"/>
-        <rect y="11" width="19" height="1"/>
+        <rect y="1" width="19" height="1" />
+        <rect y="3" width="19" height="1" />
+        <rect y="5" width="19" height="1" />
+        <rect y="7" width="19" height="1" />
+        <rect y="9" width="19" height="1" />
+        <rect y="11" width="19" height="1" />
       </g>
-      <rect x="-1" width="10" height="7" fill="#3c3b6e"/>
+      <rect x="-1" width="10" height="7" fill="#3c3b6e" />
     </svg>
   )
 }
 
 function INFlag() {
   return (
-    <svg width="28" height="20" viewBox="0 0 24 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-      <rect width="24" height="16" fill="#ff9933"/>
-      <rect y="5.33" width="24" height="5.34" fill="#fff"/>
-      <rect y="10.66" width="24" height="5.34" fill="#138808"/>
-      <circle cx="12" cy="8" r="2.5" fill="#000080"/>
-      <circle cx="12" cy="8" r="1.5" fill="#fff"/>
-      <circle cx="12" cy="8" r="1" fill="#000080"/>
+    <svg
+      width="28"
+      height="20"
+      viewBox="0 0 24 16"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <rect width="24" height="16" fill="#ff9933" />
+      <rect y="5.33" width="24" height="5.34" fill="#fff" />
+      <rect y="10.66" width="24" height="5.34" fill="#138808" />
+      <circle cx="12" cy="8" r="2.5" fill="#000080" />
+      <circle cx="12" cy="8" r="1.5" fill="#fff" />
+      <circle cx="12" cy="8" r="1" fill="#000080" />
     </svg>
   )
 }
@@ -120,6 +131,7 @@ function FlagsAndAddresses() {
         className={`flag-btn ${selected === 'us' ? 'active' : ''}`}
         onClick={() => setSelected('us')}
         aria-pressed={selected === 'us'}
+        aria-label="Show United States address"
         title="Show United States address"
       >
         <USFlag />
@@ -140,6 +152,7 @@ function FlagsAndAddresses() {
         className={`flag-btn ${selected === 'in' ? 'active' : ''}`}
         onClick={() => setSelected('in')}
         aria-pressed={selected === 'in'}
+        aria-label="Show India address"
         title="Show India address"
       >
         <INFlag />
@@ -159,23 +172,27 @@ function FlagsAndAddresses() {
 }
 
 // Navigation Buttons Component
-function NavigationButtons({ activeSection, onNavigate }: { activeSection: number, onNavigate: (index: number) => void }) {
+function NavigationButtons({
+  activeSection,
+  onNavigate,
+}: {
+  activeSection: number
+  onNavigate: (index: number) => void
+}) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
   const navItems = [
     { icon: FiUser, label: 'About', index: 0 },
     { icon: FiBriefcase, label: 'Experience', index: 1 },
     { icon: FiFolder, label: 'Projects', index: 2 },
-    { icon: FiMail, label: 'Contact', index: 3 }
+    { icon: FiMail, label: 'Contact', index: 3 },
   ]
 
   return (
     <nav className="navigation" role="navigation" aria-label="Page sections">
       {navItems.map((item) => (
         <div key={item.index} className="nav-item-container">
-          {hoveredIndex === item.index && (
-            <div className="nav-label">{item.label}</div>
-          )}
+          {hoveredIndex === item.index && <div className="nav-label">{item.label}</div>}
           <button
             className={`nav-btn ${activeSection === item.index ? 'active' : ''}`}
             onClick={() => onNavigate(item.index)}
@@ -193,41 +210,53 @@ function NavigationButtons({ activeSection, onNavigate }: { activeSection: numbe
 }
 
 // About Section (contains the original content)
-function AboutSection({ audioRef, isPlaying, setIsPlaying }: { 
-  audioRef: React.RefObject<HTMLAudioElement | null>, 
-  isPlaying: boolean, 
-  setIsPlaying: (playing: boolean) => void 
+function AboutSection({
+  audioRef,
+  isPlaying,
+  setIsPlaying,
+}: {
+  audioRef: React.RefObject<HTMLAudioElement | null>
+  isPlaying: boolean
+  setIsPlaying: (playing: boolean) => void
 }) {
   return (
     <section className="section about-section">
       <div className="content">
         <div className="title-block">
-          <h1>SWASTIK</h1>
-          <div className="name-row">
-            <h1>BISWAS</h1>
-            <button
-              className={"audio-btn " + (isPlaying ? 'playing' : '')}
-              onClick={() => {
-                if (!audioRef.current) return
-                if (isPlaying) {
-                  audioRef.current.pause()
-                } else {
-                  audioRef.current.play()
-                }
-                setIsPlaying(!isPlaying)
-              }}
-              aria-pressed={isPlaying}
-              aria-label={isPlaying ? 'Pause pronunciation' : 'Play pronunciation'}
-              title={isPlaying ? 'Pause pronunciation' : 'Play pronunciation'}
-            >
-              {isPlaying ? <FiVolumeX size={18} /> : <FiVolume2 size={18} />}
-            </button>
-          </div>
+          <h1 className="name-heading">
+            SWASTIK
+            <span className="name-row">
+              BISWAS
+              <button
+                className={'audio-btn ' + (isPlaying ? 'playing' : '')}
+                onClick={() => {
+                  const audio = audioRef.current
+                  if (!audio) return
+                  if (isPlaying) {
+                    audio.pause()
+                  } else {
+                    audio.play().catch(() => setIsPlaying(false))
+                  }
+                }}
+                aria-pressed={isPlaying}
+                aria-label={isPlaying ? 'Pause pronunciation' : 'Play pronunciation'}
+                title={isPlaying ? 'Pause pronunciation' : 'Play pronunciation'}
+              >
+                {isPlaying ? <FiVolumeX size={18} /> : <FiVolume2 size={18} />}
+              </button>
+            </span>
+          </h1>
         </div>
-        <p className="subtitle">KIIT University, Class of 2028<br/>
-                                B.Tech, Computer Science and Engineering</p>
+        <p className="subtitle">
+          KIIT University, Class of 2028
+          <br />
+          B.Tech, Computer Science and Engineering
+        </p>
         <FlagsAndAddresses />
-        <p className="subtitle">Interested in <a>Data Science</a>, <a>Machine Learning</a></p>
+        <p className="subtitle">
+          Interested in <span className="highlight">Data Science</span>,{' '}
+          <span className="highlight">Machine Learning</span>
+        </p>
       </div>
     </section>
   )
