@@ -17,12 +17,17 @@
   --text-muted: rgba(255, 255, 255, 0.74);
 
   /* Green accent + shared keyboard focus ring */
+  --accent: rgba(100, 200, 100, 0.9);
   --accent-bg: rgba(100, 200, 100, 0.15);
   --accent-border: rgba(100, 200, 100, 0.3);
   --focus-ring: 0 0 0 3px rgba(80, 200, 140, 0.5);
 
   /* Custom triangular pointer in the theme green (#64c864). Hotspot at the tip (2,2). */
   --cursor-pointer: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='24'%20height='24'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M2%202L2%2020L8%2015L17%2014Z'%20fill='%2364c864'%20stroke='%230a1f12'%20stroke-width='1.5'%20stroke-linejoin='round'/%3E%3C/svg%3E")
+    2 2;
+  /* Brighter, softly glowing variant for hovering interactive elements. Uses a
+     larger 32px canvas so the baked-in glow (feDropShadow) isn't clipped. */
+  --cursor-pointer-hover: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='32'%20height='32'%20viewBox='0%200%2032%2032'%3E%3Cdefs%3E%3Cfilter%20id='g'%20filterUnits='userSpaceOnUse'%20x='0'%20y='0'%20width='32'%20height='32'%3E%3CfeDropShadow%20dx='0'%20dy='0'%20stdDeviation='2'%20flood-color='%235dff5d'%20flood-opacity='0.85'/%3E%3C/filter%3E%3C/defs%3E%3Cpath%20d='M2%202L2%2020L8%2015L17%2014Z'%20fill='%23a8ffa8'%20stroke='%230a1f12'%20stroke-width='1.5'%20stroke-linejoin='round'%20filter='url(%23g)'/%3E%3C/svg%3E")
     2 2;
 }
 

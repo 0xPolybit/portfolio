@@ -1,5 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
-import { FiVolume2, FiVolumeX, FiUser, FiBriefcase, FiFolder, FiMail } from 'react-icons/fi'
+import {
+  FiVolume2,
+  FiVolumeX,
+  FiUser,
+  FiBriefcase,
+  FiFolder,
+  FiMail,
+  FiGithub,
+  FiLinkedin,
+} from 'react-icons/fi'
 import './App.css'
 
 function App() {
@@ -383,13 +392,52 @@ function AboutSection({
   )
 }
 
-// Experience Section (blank for now)
+// Experience Section
+const experiences = [
+  {
+    role: 'Artificial Intelligence Intern',
+    company: 'Exavalu',
+    type: 'Internship',
+    period: 'May 2026 – Jun 2026',
+    location: 'Kolkata, West Bengal, India · Hybrid',
+    skills: ['Artificial Intelligence', 'Engineering'],
+  },
+  {
+    role: 'Artificial Intelligence Intern',
+    company: 'Indian Statistical Institute, Kolkata',
+    type: 'Internship',
+    period: 'Apr 2026 – Jun 2026',
+    location: 'Kolkata, West Bengal, India · Remote',
+    skills: ['Artificial Intelligence', 'Python'],
+  },
+]
+
 function ExperienceSection() {
   return (
     <section className="section experience-section">
       <div className="content">
         <h2>Experience</h2>
-        <p>Coming soon...</p>
+        <ul className="experience-list">
+          {experiences.map((exp) => (
+            <li key={`${exp.role}-${exp.company}`} className="experience-item">
+              <div className="experience-head">
+                <h3 className="experience-role">{exp.role}</h3>
+                <span className="experience-period">{exp.period}</span>
+              </div>
+              <p className="experience-company">
+                {exp.company} · {exp.type}
+              </p>
+              <p className="experience-location">{exp.location}</p>
+              <ul className="experience-skills">
+                {exp.skills.map((skill) => (
+                  <li key={skill} className="skill-tag">
+                    {skill}
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   )
@@ -407,13 +455,50 @@ function ProjectsSection() {
   )
 }
 
-// Contact Section (blank for now)
+// Contact Section
+const contactLinks = [
+  {
+    icon: FiMail,
+    label: 'swastikbiswas962@gmail.com',
+    href: 'mailto:swastikbiswas962@gmail.com',
+    external: false,
+  },
+  {
+    icon: FiGithub,
+    label: 'github.com/0xPolybit',
+    href: 'https://github.com/0xPolybit',
+    external: true,
+  },
+  {
+    icon: FiLinkedin,
+    label: 'linkedin.com/in/polybit',
+    href: 'https://www.linkedin.com/in/polybit/',
+    external: true,
+  },
+]
+
 function ContactSection() {
   return (
     <section className="section contact-section">
       <div className="content">
         <h2>Contact</h2>
-        <p>Coming soon...</p>
+        <p className="contact-intro">
+          Open to internships and collaboration — let's build something.
+        </p>
+        <ul className="contact-list">
+          {contactLinks.map((link) => (
+            <li key={link.href}>
+              <a
+                className="contact-link"
+                href={link.href}
+                {...(link.external ? { target: '_blank', rel: 'noreferrer noopener' } : {})}
+              >
+                <link.icon size={20} aria-hidden="true" />
+                <span>{link.label}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   )
