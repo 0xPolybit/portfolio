@@ -91,7 +91,7 @@
   -webkit-text-fill-color: initial;
   padding: 0.3rem 0.3rem;
   font-size: 1rem;
-  cursor: pointer;
+  cursor: var(--cursor-pointer), pointer;
 }
 
 .audio-btn.playing {
@@ -129,7 +129,7 @@
   color: white;
   font-size: 1.4rem;
   padding: 0.3rem 0.45rem;
-  cursor: pointer;
+  cursor: var(--cursor-pointer), pointer;
   transition:
     transform 150ms ease,
     border-color 150ms ease,
@@ -302,7 +302,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+  cursor: var(--cursor-pointer), pointer;
   transition: all 250ms ease;
   backdrop-filter: blur(8px);
 }

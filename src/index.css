@@ -20,6 +20,10 @@
   --accent-bg: rgba(100, 200, 100, 0.15);
   --accent-border: rgba(100, 200, 100, 0.3);
   --focus-ring: 0 0 0 3px rgba(80, 200, 140, 0.5);
+
+  /* Custom triangular pointer in the theme green (#64c864). Hotspot at the tip (2,2). */
+  --cursor-pointer: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='24'%20height='24'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M2%202L2%2020L8%2015L17%2014Z'%20fill='%2364c864'%20stroke='%230a1f12'%20stroke-width='1.5'%20stroke-linejoin='round'/%3E%3C/svg%3E")
+    2 2;
 }
 
 * {
@@ -34,6 +38,7 @@ body {
   height: 100dvh; /* track dynamic viewport (mobile address bar) */
   width: 100%;
   overflow: hidden; /* Remove scroll */
+  cursor: var(--cursor-pointer), auto;
 }
 
 body {
