@@ -12,10 +12,6 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* CSS variables for mouse position */
-  --mouse-x: 50vw;
-  --mouse-y: 50vh;
-
   /* Text colors (tuned for WCAG AA contrast on the #0a0a0a background) */
   --text-strong: rgba(255, 255, 255, 0.92);
   --text-muted: rgba(255, 255, 255, 0.74);

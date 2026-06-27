@@ -28,49 +28,16 @@
   animation: fadeInGlows 800ms ease 0s forwards;
 }
 
+/* Canvas that renders the animated dot grid (spotlight + cursor warp).
+   Dots, spacing, and per-dot motion are all drawn in JS — see DotGrid. */
 .grid-background {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
-  background-size: 32px 32px;
+  display: block;
   pointer-events: none;
-}
-
-/* Highlight layer that only brightens grid lines near cursor.
-   We create an overlay that uses the same grid background but with
-   stronger line color, then mask it with a radial gradient centered
-   at the mouse position so only the area near the cursor shows the
-   brighter grid lines. */
-.grid-background::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px);
-  background-size: 32px 32px;
-  /* mask to reveal only near the mouse */
-  -webkit-mask-image: radial-gradient(
-    300px circle at var(--mouse-x) var(--mouse-y),
-    rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 0.35) 40%,
-    rgba(0, 0, 0, 0) 70%
-  );
-  mask-image: radial-gradient(
-    300px circle at var(--mouse-x) var(--mouse-y),
-    rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 0.35) 40%,
-    rgba(0, 0, 0, 0) 70%
-  );
-  transition:
-    opacity 0.18s ease,
-    transform 0.18s ease;
 }
 
 .content {
@@ -507,15 +474,6 @@
 
   .name-row {
     gap: 0.4rem;
-  }
-
-  /* Grid background smaller on mobile */
-  .grid-background {
-    background-size: 24px 24px;
-  }
-
-  .grid-background::before {
-    background-size: 24px 24px;
   }
 }
 

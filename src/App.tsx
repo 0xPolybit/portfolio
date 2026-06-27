@@ -3,31 +3,10 @@ import { FiVolume2, FiVolumeX, FiUser, FiBriefcase, FiFolder, FiMail } from 'rea
 import './App.css'
 
 function App() {
-  const containerRef = useRef<HTMLDivElement>(null)
   const sectionsRef = useRef<HTMLDivElement>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [activeSection, setActiveSection] = useState(0) // 0: About, 1: Experience, 2: Projects, 3: Contact
-
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const rect = container.getBoundingClientRect()
-      const x = e.clientX - rect.left
-      const y = e.clientY - rect.top
-
-      container.style.setProperty('--mouse-x', `${x}px`)
-      container.style.setProperty('--mouse-y', `${y}px`)
-    }
-
-    container.addEventListener('mousemove', handleMouseMove)
-
-    return () => {
-      container.removeEventListener('mousemove', handleMouseMove)
-    }
-  }, [])
 
   useEffect(() => {
     // create audio element that points to public/pronounciation.mp3
@@ -60,8 +39,8 @@ function App() {
   }
 
   return (
-    <div ref={containerRef} className="app-container">
-      <div className="grid-background"></div>
+    <div className="app-container">
+      <DotGrid />
 
       {/* Navigation */}
       <NavigationButtons activeSection={activeSection} onNavigate={navigateToSection} />
@@ -75,6 +54,148 @@ function App() {
       </div>
     </div>
   )
+}
+
+// Animated dot-grid background. Dots brighten as the cursor nears (spotlight)
+// and are pushed away from it (warp). Rendered on a canvas so each dot can move
+// independently — something the old CSS gradient grid couldn't do.
+function DotGrid() {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    const DOT_RADIUS = 1.3 // base dot size in px
+    const REPEL_RADIUS = 130 // how close the cursor must be to push a dot
+    const REPEL_STRENGTH = 30 // max distance a dot is pushed, in px
+    const SPOTLIGHT_RADIUS = 220 // how far the cursor brightens dots
+    const BASE_ALPHA = 0.12 // resting dot opacity
+    const HOVER_ALPHA = 0.65 // dot opacity right under the cursor
+    const EASE = 0.12 // how quickly the warp follows the cursor (0-1)
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    let width = 0
+    let height = 0
+    let spacing = 32
+    let raf = 0
+    let running = false
+    const mouse = { x: -9999, y: -9999 } // raw cursor target
+    const eased = { x: -9999, y: -9999 } // smoothed position that drives the warp
+
+    const draw = () => {
+      ctx.clearRect(0, 0, width, height)
+      const cols = Math.ceil(width / spacing) + 1
+      const rows = Math.ceil(height / spacing) + 1
+
+      for (let i = 0; i < cols; i++) {
+        for (let j = 0; j < rows; j++) {
+          const gx = i * spacing
+          const gy = j * spacing
+          const dx = gx - eased.x
+          const dy = gy - eased.y
+          const dist = Math.hypot(dx, dy)
+
+          let x = gx
+          let y = gy
+          let alpha = BASE_ALPHA
+
+          if (dist < REPEL_RADIUS && dist > 0.001) {
+            const t = 1 - dist / REPEL_RADIUS
+            const push = t * t * REPEL_STRENGTH // ease-in falloff for an organic bulge
+            x += (dx / dist) * push
+            y += (dy / dist) * push
+          }
+          if (dist < SPOTLIGHT_RADIUS) {
+            alpha = BASE_ALPHA + (1 - dist / SPOTLIGHT_RADIUS) * (HOVER_ALPHA - BASE_ALPHA)
+          }
+
+          ctx.beginPath()
+          ctx.arc(x, y, DOT_RADIUS, 0, Math.PI * 2)
+          ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`
+          ctx.fill()
+        }
+      }
+    }
+
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2)
+      width = window.innerWidth
+      height = window.innerHeight
+      spacing = width < 768 ? 24 : 32
+      canvas.width = Math.floor(width * dpr)
+      canvas.height = Math.floor(height * dpr)
+      canvas.style.width = `${width}px`
+      canvas.style.height = `${height}px`
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      if (!running) draw()
+    }
+
+    const render = () => {
+      eased.x += (mouse.x - eased.x) * EASE
+      eased.y += (mouse.y - eased.y) * EASE
+      draw()
+
+      // When the cursor has left and the warp has glided off-screen, the grid is
+      // back at rest — stop the loop until the next interaction to save battery.
+      const offscreen =
+        eased.x < -REPEL_RADIUS ||
+        eased.x > width + REPEL_RADIUS ||
+        eased.y < -REPEL_RADIUS ||
+        eased.y > height + REPEL_RADIUS
+      if (mouse.x < -9000 && offscreen) {
+        running = false
+        return
+      }
+      raf = requestAnimationFrame(render)
+    }
+
+    const start = () => {
+      if (!running) {
+        running = true
+        raf = requestAnimationFrame(render)
+      }
+    }
+
+    const onMove = (e: MouseEvent) => {
+      // Snap on first entry so the warp doesn't sweep in from off-screen.
+      if (mouse.x < -9000) {
+        eased.x = e.clientX
+        eased.y = e.clientY
+      }
+      mouse.x = e.clientX
+      mouse.y = e.clientY
+      start()
+    }
+
+    const onOut = (e: MouseEvent) => {
+      // relatedTarget is null only when the cursor actually leaves the window.
+      if (!e.relatedTarget) {
+        mouse.x = -9999
+        mouse.y = -9999
+        start()
+      }
+    }
+
+    resize()
+    window.addEventListener('resize', resize)
+    if (!reduceMotion) {
+      window.addEventListener('mousemove', onMove)
+      window.addEventListener('mouseout', onOut)
+    }
+
+    return () => {
+      cancelAnimationFrame(raf)
+      window.removeEventListener('resize', resize)
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseout', onOut)
+    }
+  }, [])
+
+  return <canvas ref={canvasRef} className="grid-background" aria-hidden="true" />
 }
 
 function USFlag() {
