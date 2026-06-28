@@ -8,6 +8,7 @@ import {
   FiMail,
   FiGithub,
   FiLinkedin,
+  FiX,
 } from 'react-icons/fi'
 import './App.css'
 
@@ -442,32 +443,85 @@ const experiences: Experience[] = [
 ]
 
 function ExperienceSection() {
+  const [selected, setSelected] = useState<number | null>(null)
+
+  // Allow Escape to close the detail panel while one is open.
+  useEffect(() => {
+    if (selected === null) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSelected(null)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [selected])
+
+  const active = selected === null ? null : experiences[selected]
+
   return (
     <section className="section experience-section">
       <div className="content">
         <h2>Experience</h2>
-        <ul className="experience-list">
-          {experiences.map((exp) => (
-            <li key={`${exp.role}-${exp.company}`} className="experience-item">
-              <div className="experience-head">
-                <h3 className="experience-role">{exp.role}</h3>
-                <span className="experience-period">{exp.period}</span>
-              </div>
-              <p className="experience-company">
-                {exp.company} · {exp.type}
+        <div className={`experience-body ${active ? 'has-detail' : ''}`}>
+          <ul className="experience-list">
+            {experiences.map((exp, i) => (
+              <li
+                key={`${exp.role}-${exp.company}`}
+                className={`experience-item ${selected === i ? 'selected' : ''}`}
+                role="button"
+                tabIndex={0}
+                aria-pressed={selected === i}
+                aria-label={`${exp.role} at ${exp.company} — view details`}
+                onClick={() => setSelected(i)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    setSelected(i)
+                  }
+                }}
+              >
+                <div className="experience-head">
+                  <h3 className="experience-role">{exp.role}</h3>
+                  <span className="experience-period">{exp.period}</span>
+                </div>
+                <p className="experience-company">
+                  {exp.company} · {exp.type}
+                </p>
+                <p className="experience-location">{exp.location}</p>
+              </li>
+            ))}
+          </ul>
+
+          {active && (
+            <aside
+              key={selected}
+              className="experience-detail"
+              aria-label={`${active.role} details`}
+            >
+              <button
+                className="detail-close"
+                onClick={() => setSelected(null)}
+                aria-label="Close details"
+                title="Close"
+              >
+                <FiX size={18} />
+              </button>
+              <h3 className="detail-role">{active.role}</h3>
+              <p className="detail-company">
+                {active.company} · {active.type}
               </p>
-              <p className="experience-location">{exp.location}</p>
-              {exp.description && <p className="experience-description">{exp.description}</p>}
-              <ul className="experience-skills">
-                {exp.skills.map((skill) => (
+              <p className="detail-meta">{active.period}</p>
+              <p className="detail-meta">{active.location}</p>
+              {active.description && <p className="detail-description">{active.description}</p>}
+              <ul className="experience-skills detail-skills">
+                {active.skills.map((skill) => (
                   <li key={skill} className="skill-tag">
                     {skill}
                   </li>
                 ))}
               </ul>
-            </li>
-          ))}
-        </ul>
+            </aside>
+          )}
+        </div>
       </div>
     </section>
   )
