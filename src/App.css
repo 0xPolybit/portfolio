@@ -408,6 +408,26 @@
   color: var(--text-muted);
 }
 
+/* Experience can hold several entries. Let the section scroll within the
+   viewport (top-aligned via `safe`) instead of clipping when the list is taller
+   than the screen; it stays vertically centered when everything fits. */
+.experience-section .content {
+  height: 100vh;
+  height: 100dvh;
+  justify-content: safe center;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+
+.experience-section .content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.experience-section .content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.16);
+}
+
 /* Experience list */
 .experience-list {
   list-style: none;
@@ -473,6 +493,15 @@
   font-size: 0.85rem;
   color: var(--text-muted);
   margin: 0.15rem 0 0;
+}
+
+.experience-description {
+  font-family: 'Space Grotesk', monospace;
+  font-size: 0.9rem;
+  color: var(--text-strong);
+  line-height: 1.5;
+  margin: 0.6rem 0 0;
+  max-width: 60ch;
 }
 
 .experience-skills {

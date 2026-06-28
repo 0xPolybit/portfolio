@@ -393,7 +393,36 @@ function AboutSection({
 }
 
 // Experience Section
-const experiences = [
+type Experience = {
+  role: string
+  company: string
+  type: string
+  period: string
+  location: string
+  description?: string
+  skills: string[]
+}
+
+const experiences: Experience[] = [
+  {
+    role: 'Chief Technology Officer',
+    company: 'Octran Technologies',
+    type: 'Self-employed',
+    period: 'Mar 2025 – Present',
+    location: 'Kolkata, West Bengal, India · Hybrid',
+    description:
+      'Co-founder. I supervise the technology sector of the company, along with the overall executive processes.',
+    skills: ['TensorFlow', 'Project Management'],
+  },
+  {
+    role: 'Machine Learning Internship',
+    company: 'FlyRank AI',
+    type: 'Internship',
+    period: 'Jun 2026 – Present',
+    location: 'Chicago, Illinois, United States · Remote',
+    description: 'Currently interning at FlyRank AI as an AI intern, focusing on Machine Learning.',
+    skills: ['Artificial Intelligence', 'Machine Learning'],
+  },
   {
     role: 'Artificial Intelligence Intern',
     company: 'Exavalu',
@@ -428,6 +457,7 @@ function ExperienceSection() {
                 {exp.company} · {exp.type}
               </p>
               <p className="experience-location">{exp.location}</p>
+              {exp.description && <p className="experience-description">{exp.description}</p>}
               <ul className="experience-skills">
                 {exp.skills.map((skill) => (
                   <li key={skill} className="skill-tag">
