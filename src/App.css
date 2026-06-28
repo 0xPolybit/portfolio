@@ -652,6 +652,33 @@
   margin: 0.7rem 0 0;
 }
 
+.detail-company-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--text-strong);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  cursor: var(--cursor-pointer), pointer;
+  transition:
+    color 150ms ease,
+    border-color 150ms ease;
+}
+
+.detail-company-link svg {
+  color: var(--accent);
+}
+
+.detail-company-link:hover {
+  color: #fff;
+  border-bottom-color: var(--accent-border);
+}
+
+.detail-company-link:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
 .detail-meta {
   font-family: 'Space Grotesk', monospace;
   font-size: 0.85rem;
@@ -729,7 +756,8 @@
 .contact-link:hover,
 .experience-item:hover,
 .detail-close:hover,
-.filter-chip:hover {
+.filter-chip:hover,
+.detail-company-link:hover {
   cursor: var(--cursor-pointer-hover), pointer;
 }
 

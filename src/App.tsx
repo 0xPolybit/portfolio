@@ -9,6 +9,7 @@ import {
   FiGithub,
   FiLinkedin,
   FiX,
+  FiExternalLink,
 } from 'react-icons/fi'
 import './App.css'
 
@@ -397,6 +398,7 @@ function AboutSection({
 type Experience = {
   role: string
   company: string
+  website?: string
   type: string
   period: string
   location: string
@@ -408,6 +410,7 @@ const experiences: Experience[] = [
   {
     role: 'Chief Technology Officer',
     company: 'Octran Technologies',
+    website: 'https://octran.tech/',
     type: 'Self-employed',
     period: 'Mar 2025 – Present',
     location: 'Kolkata, West Bengal, India · Hybrid',
@@ -418,6 +421,7 @@ const experiences: Experience[] = [
   {
     role: 'Machine Learning Internship',
     company: 'FlyRank AI',
+    website: 'https://flyrank.ai/',
     type: 'Internship',
     period: 'Jun 2026 – Present',
     location: 'Chicago, Illinois, United States · Remote',
@@ -427,6 +431,7 @@ const experiences: Experience[] = [
   {
     role: 'Artificial Intelligence Intern',
     company: 'Exavalu',
+    website: 'https://www.exavalu.com/',
     type: 'Internship',
     period: 'May 2026 – Jun 2026',
     location: 'Kolkata, West Bengal, India · Hybrid',
@@ -435,6 +440,7 @@ const experiences: Experience[] = [
   {
     role: 'Artificial Intelligence Intern',
     company: 'Indian Statistical Institute, Kolkata',
+    website: 'https://www.isical.ac.in/index',
     type: 'Internship',
     period: 'Apr 2026 – Jun 2026',
     location: 'Kolkata, West Bengal, India · Remote',
@@ -541,7 +547,20 @@ function ExperienceSection() {
               </button>
               <h3 className="detail-role">{active.role}</h3>
               <p className="detail-company">
-                {active.company} · {active.type}
+                {active.website ? (
+                  <a
+                    className="detail-company-link"
+                    href={active.website}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
+                    {active.company}
+                    <FiExternalLink size={14} aria-hidden="true" />
+                  </a>
+                ) : (
+                  active.company
+                )}{' '}
+                · {active.type}
               </p>
               <p className="detail-meta">{active.period}</p>
               <p className="detail-meta">{active.location}</p>
