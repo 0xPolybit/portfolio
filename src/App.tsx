@@ -442,8 +442,11 @@ const experiences: Experience[] = [
   },
 ]
 
+const employmentTypes = ['Internship', 'Self-employed', 'Full-time', 'Part-time']
+
 function ExperienceSection() {
   const [selected, setSelected] = useState<number | null>(null)
+  const [filters, setFilters] = useState<string[]>([])
 
   // Allow Escape to close the detail panel while one is open.
   useEffect(() => {
@@ -455,41 +458,72 @@ function ExperienceSection() {
     return () => window.removeEventListener('keydown', onKey)
   }, [selected])
 
+  // Close the detail panel if its card gets filtered out of the list.
+  useEffect(() => {
+    if (selected !== null && filters.length > 0 && !filters.includes(experiences[selected].type)) {
+      setSelected(null)
+    }
+  }, [filters, selected])
+
+  const toggleFilter = (type: string) =>
+    setFilters((prev) => (prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]))
+
+  // Keep the original index so selection still maps into the full array.
+  const visible = experiences
+    .map((exp, i) => ({ exp, i }))
+    .filter(({ exp }) => filters.length === 0 || filters.includes(exp.type))
+
   const active = selected === null ? null : experiences[selected]
 
   return (
     <section className="section experience-section">
       <div className="content">
         <h2>Experience</h2>
+        <div className="experience-filters" role="group" aria-label="Filter by employment type">
+          {employmentTypes.map((type) => (
+            <button
+              key={type}
+              className={`filter-chip ${filters.includes(type) ? 'active' : ''}`}
+              aria-pressed={filters.includes(type)}
+              onClick={() => toggleFilter(type)}
+            >
+              {type}
+            </button>
+          ))}
+        </div>
         <div className={`experience-body ${active ? 'has-detail' : ''}`}>
-          <ul className="experience-list">
-            {experiences.map((exp, i) => (
-              <li
-                key={`${exp.role}-${exp.company}`}
-                className={`experience-item ${selected === i ? 'selected' : ''}`}
-                role="button"
-                tabIndex={0}
-                aria-pressed={selected === i}
-                aria-label={`${exp.role} at ${exp.company} — view details`}
-                onClick={() => setSelected(i)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault()
-                    setSelected(i)
-                  }
-                }}
-              >
-                <div className="experience-head">
-                  <h3 className="experience-role">{exp.role}</h3>
-                  <span className="experience-period">{exp.period}</span>
-                </div>
-                <p className="experience-company">
-                  {exp.company} · {exp.type}
-                </p>
-                <p className="experience-location">{exp.location}</p>
-              </li>
-            ))}
-          </ul>
+          {visible.length === 0 ? (
+            <p className="experience-empty">No experiences match the selected filters.</p>
+          ) : (
+            <ul className="experience-list">
+              {visible.map(({ exp, i }) => (
+                <li
+                  key={`${exp.role}-${exp.company}`}
+                  className={`experience-item ${selected === i ? 'selected' : ''}`}
+                  role="button"
+                  tabIndex={0}
+                  aria-pressed={selected === i}
+                  aria-label={`${exp.role} at ${exp.company} — view details`}
+                  onClick={() => setSelected(i)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      setSelected(i)
+                    }
+                  }}
+                >
+                  <div className="experience-head">
+                    <h3 className="experience-role">{exp.role}</h3>
+                    <span className="experience-period">{exp.period}</span>
+                  </div>
+                  <p className="experience-company">
+                    {exp.company} · {exp.type}
+                  </p>
+                  <p className="experience-location">{exp.location}</p>
+                </li>
+              ))}
+            </ul>
+          )}
 
           {active && (
             <aside
