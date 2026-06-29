@@ -730,6 +730,21 @@ const projects: Project[] = [
     ],
     skills: ['Java', 'Competitive Programming'],
   },
+  {
+    title: 'Auto Email Sendr',
+    period: 'June 2024',
+    description: 'Automatic email mass-sender, for outreach and campaigns.',
+    links: [{ type: 'github', href: 'https://github.com/0xPolybit/auto-email-sendr' }],
+    media: [
+      {
+        type: 'image',
+        href: '/auto-email-sendr-screenshot.png',
+        thumb: '/auto-email-sendr-screenshot.png',
+        label: 'Auto Email Sendr — Screenshot',
+      },
+    ],
+    skills: ['Python', 'SMTP'],
+  },
 ]
 
 function ProjectsSection() {
