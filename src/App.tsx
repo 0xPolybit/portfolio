@@ -10,6 +10,8 @@ import {
   FiLinkedin,
   FiX,
   FiExternalLink,
+  FiChevronLeft,
+  FiChevronRight,
 } from 'react-icons/fi'
 import './App.css'
 
@@ -395,6 +397,13 @@ function AboutSection({
 }
 
 // Experience Section
+type MediaItem = {
+  type: 'image' | 'pdf' | 'link'
+  href: string // opened in a new tab on click
+  thumb?: string // thumbnail image (for image / pdf)
+  label: string
+}
+
 type Experience = {
   role: string
   company: string
@@ -403,6 +412,7 @@ type Experience = {
   period: string
   location: string
   description?: string
+  media?: MediaItem[]
   skills: string[]
 }
 
@@ -435,6 +445,25 @@ const experiences: Experience[] = [
     type: 'Internship',
     period: 'May 2026 – Jun 2026',
     location: 'Kolkata, West Bengal, India · Hybrid',
+    media: [
+      {
+        type: 'pdf',
+        href: '/exavalu-internship-letter-of-completion.pdf',
+        thumb: '/exavalu-internship-letter-of-completion.thumb.png',
+        label: 'Letter of Completion',
+      },
+      {
+        type: 'pdf',
+        href: '/exavalu-internship-certificate.pdf',
+        thumb: '/exavalu-internship-certificate.thumb.png',
+        label: 'Certificate of Internship',
+      },
+      {
+        type: 'link',
+        href: 'https://www.linkedin.com/feed/update/urn:li:activity:7477084708103790592/',
+        label: 'LinkedIn post',
+      },
+    ],
     skills: ['Artificial Intelligence', 'Engineering'],
   },
   {
@@ -447,6 +476,93 @@ const experiences: Experience[] = [
     skills: ['Artificial Intelligence', 'Python'],
   },
 ]
+
+// Horizontal media carousel for the detail panel. Handles images, PDFs and
+// links; every tile opens its target in a new tab. Arrows appear only when the
+// strip overflows.
+function MediaCarousel({ items }: { items: MediaItem[] }) {
+  const trackRef = useRef<HTMLDivElement>(null)
+  const [canLeft, setCanLeft] = useState(false)
+  const [canRight, setCanRight] = useState(false)
+
+  useEffect(() => {
+    const el = trackRef.current
+    if (!el) return
+    const update = () => {
+      setCanLeft(el.scrollLeft > 1)
+      setCanRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1)
+    }
+    update()
+    el.addEventListener('scroll', update, { passive: true })
+    window.addEventListener('resize', update)
+    return () => {
+      el.removeEventListener('scroll', update)
+      window.removeEventListener('resize', update)
+    }
+  }, [items])
+
+  const scroll = (dir: number) =>
+    trackRef.current?.scrollBy({
+      left: dir * trackRef.current.clientWidth * 0.8,
+      behavior: 'smooth',
+    })
+
+  const showArrows = canLeft || canRight
+
+  return (
+    <div className="media-carousel">
+      {showArrows && (
+        <button
+          className="media-nav prev"
+          onClick={() => scroll(-1)}
+          disabled={!canLeft}
+          aria-label="Scroll media left"
+        >
+          <FiChevronLeft size={18} />
+        </button>
+      )}
+      <div className="media-track" ref={trackRef}>
+        {items.map((m) => (
+          <a
+            key={m.href}
+            className="media-tile"
+            href={m.href}
+            target="_blank"
+            rel="noreferrer noopener"
+            title={m.label}
+          >
+            <span className="media-thumb">
+              {m.type === 'link' ? (
+                <span className="media-icon">
+                  {m.href.includes('linkedin.com') ? (
+                    <FiLinkedin size={30} />
+                  ) : (
+                    <FiExternalLink size={30} />
+                  )}
+                </span>
+              ) : (
+                <img src={m.thumb} alt={m.label} loading="lazy" />
+              )}
+              <span className="media-type">{m.type}</span>
+              <FiExternalLink className="media-ext" size={14} aria-hidden="true" />
+            </span>
+            <span className="media-caption">{m.label}</span>
+          </a>
+        ))}
+      </div>
+      {showArrows && (
+        <button
+          className="media-nav next"
+          onClick={() => scroll(1)}
+          disabled={!canRight}
+          aria-label="Scroll media right"
+        >
+          <FiChevronRight size={18} />
+        </button>
+      )}
+    </div>
+  )
+}
 
 const employmentTypes = ['Internship', 'Self-employed', 'Full-time', 'Part-time']
 
@@ -565,6 +681,7 @@ function ExperienceSection() {
               <p className="detail-meta">{active.period}</p>
               <p className="detail-meta">{active.location}</p>
               {active.description && <p className="detail-description">{active.description}</p>}
+              {active.media && active.media.length > 0 && <MediaCarousel items={active.media} />}
               <ul className="experience-skills detail-skills">
                 {active.skills.map((skill) => (
                   <li key={skill} className="skill-tag">
