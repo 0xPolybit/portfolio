@@ -401,17 +401,18 @@
   margin-bottom: 1rem;
 }
 
-.projects-section .content p,
 .contact-section .content p {
   font-family: 'Space Grotesk', monospace;
   font-size: 1.2rem;
   color: var(--text-muted);
 }
 
-/* Experience uses a master-detail layout: a scrollable list on the left and,
-   when a card is selected, an expanded detail panel on the right. The content
-   fills the viewport height and the list scrolls internally instead of clipping. */
-.experience-section .content {
+/* Experience and Projects use a master-detail layout: a scrollable list on the
+   left and, when a card is selected, an expanded detail panel on the right. The
+   content fills the viewport height and the list scrolls internally instead of
+   clipping. */
+.experience-section .content,
+.projects-section .content {
   height: 100vh;
   height: 100dvh;
   justify-content: flex-start;
@@ -679,6 +680,47 @@
   box-shadow: var(--focus-ring);
 }
 
+/* Project links (GitHub / live demo) in the detail panel */
+.detail-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.9rem;
+}
+
+.detail-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: 'Space Grotesk', monospace;
+  font-size: 0.85rem;
+  color: var(--text-strong);
+  text-decoration: none;
+  padding: 0.4rem 0.8rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: var(--cursor-pointer), pointer;
+  transition:
+    color 150ms ease,
+    border-color 150ms ease,
+    background-color 150ms ease;
+}
+
+.detail-link svg {
+  color: var(--accent);
+}
+
+.detail-link:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--accent-border);
+}
+
+.detail-link:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
 .detail-meta {
   font-family: 'Space Grotesk', monospace;
   font-size: 0.85rem;
@@ -905,6 +947,7 @@
 .detail-close:hover,
 .filter-chip:hover,
 .detail-company-link:hover,
+.detail-link:hover,
 .media-tile:hover,
 .media-nav:hover {
   cursor: var(--cursor-pointer-hover), pointer;
@@ -963,8 +1006,9 @@
     font-size: 2.2rem;
   }
 
-  /* Experience: stack the list and detail, scroll the whole section */
-  .experience-section .content {
+  /* Experience & Projects: stack the list and detail, scroll the whole section */
+  .experience-section .content,
+  .projects-section .content {
     overflow-y: auto;
   }
 

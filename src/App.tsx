@@ -697,13 +697,129 @@ function ExperienceSection() {
   )
 }
 
-// Projects Section (blank for now)
+// Projects Section — same master-detail layout as Experience
+type ProjectLink = { type: 'github' | 'website'; href: string }
+
+type Project = {
+  title: string
+  period: string
+  description?: string
+  links?: ProjectLink[]
+  media?: MediaItem[]
+  skills: string[]
+}
+
+const projects: Project[] = [
+  {
+    title: 'CP Ally IDE',
+    period: 'May 2026 – Present',
+    description:
+      'A focused code editor for competitive programming on Codeforces — fetch problems, write solutions, and test locally, all in one window.',
+    links: [
+      { type: 'github', href: 'https://github.com/0xPolybit/cp-ally-ide' },
+      { type: 'website', href: 'https://cp-ally-ide.vercel.app/' },
+    ],
+    media: [
+      {
+        type: 'image',
+        href: '/cp-ally-ide-screenshot.png',
+        thumb: '/cp-ally-ide-screenshot.png',
+        label: 'CP Ally IDE — v0.2.2 Screenshot',
+      },
+    ],
+    skills: ['Java', 'Competitive Programming'],
+  },
+]
+
 function ProjectsSection() {
+  const [selected, setSelected] = useState<number | null>(null)
+
+  // Allow Escape to close the detail panel while one is open.
+  useEffect(() => {
+    if (selected === null) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSelected(null)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [selected])
+
+  const active = selected === null ? null : projects[selected]
+
   return (
     <section className="section projects-section">
       <div className="content">
         <h2>Projects</h2>
-        <p>Coming soon...</p>
+        <div className={`experience-body ${active ? 'has-detail' : ''}`}>
+          <ul className="experience-list">
+            {projects.map((p, i) => (
+              <li
+                key={p.title}
+                className={`experience-item ${selected === i ? 'selected' : ''}`}
+                role="button"
+                tabIndex={0}
+                aria-pressed={selected === i}
+                aria-label={`${p.title} — view details`}
+                onClick={() => setSelected(i)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    setSelected(i)
+                  }
+                }}
+              >
+                <div className="experience-head">
+                  <h3 className="experience-role">{p.title}</h3>
+                  <span className="experience-period">{p.period}</span>
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          {active && (
+            <aside
+              key={selected}
+              className="experience-detail"
+              aria-label={`${active.title} details`}
+            >
+              <button
+                className="detail-close"
+                onClick={() => setSelected(null)}
+                aria-label="Close details"
+                title="Close"
+              >
+                <FiX size={18} />
+              </button>
+              <h3 className="detail-role">{active.title}</h3>
+              <p className="detail-meta">{active.period}</p>
+              {active.links && active.links.length > 0 && (
+                <div className="detail-links">
+                  {active.links.map((l) => (
+                    <a
+                      key={l.href}
+                      className="detail-link"
+                      href={l.href}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                    >
+                      {l.type === 'github' ? <FiGithub size={15} /> : <FiExternalLink size={15} />}
+                      {l.type === 'github' ? 'GitHub' : 'Landing Page'}
+                    </a>
+                  ))}
+                </div>
+              )}
+              {active.description && <p className="detail-description">{active.description}</p>}
+              {active.media && active.media.length > 0 && <MediaCarousel items={active.media} />}
+              <ul className="experience-skills detail-skills">
+                {active.skills.map((skill) => (
+                  <li key={skill} className="skill-tag">
+                    {skill}
+                  </li>
+                ))}
+              </ul>
+            </aside>
+          )}
+        </div>
       </div>
     </section>
   )
