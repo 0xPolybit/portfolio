@@ -938,11 +938,51 @@
   box-shadow: var(--focus-ring);
 }
 
+/* Icon-only social row */
+.social-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin: 1rem 0 0;
+  padding: 0;
+}
+
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  color: var(--accent);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: var(--cursor-pointer), pointer;
+  transition:
+    color 150ms ease,
+    border-color 150ms ease,
+    background-color 150ms ease,
+    transform 150ms ease;
+}
+
+.social-link:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--accent-border);
+  transform: translateY(-2px);
+}
+
+.social-link:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
 /* Brighter, glowing cursor while hovering any interactive control */
 .audio-btn:hover,
 .flag-btn:hover,
 .nav-btn:hover,
 .contact-link:hover,
+.social-link:hover,
 .experience-item:hover,
 .detail-close:hover,
 .filter-chip:hover,

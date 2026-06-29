@@ -13,6 +13,7 @@ import {
   FiChevronLeft,
   FiChevronRight,
 } from 'react-icons/fi'
+import { SiInstagram, SiStackoverflow, SiCodeforces, SiLeetcode, SiX } from 'react-icons/si'
 import './App.css'
 
 function App() {
@@ -847,6 +848,22 @@ const contactLinks = [
   },
 ]
 
+const socialLinks = [
+  { icon: SiInstagram, label: 'Instagram', href: 'https://www.instagram.com/0xswastikbiswas/' },
+  {
+    icon: SiStackoverflow,
+    label: 'Stack Overflow',
+    href: 'https://stackoverflow.com/users/14855018/swastik-polybit-biswas',
+  },
+  {
+    icon: SiCodeforces,
+    label: 'Codeforces',
+    href: 'https://codeforces.com/profile/swastikpolybitbiswas',
+  },
+  { icon: SiLeetcode, label: 'LeetCode', href: 'https://leetcode.com/u/swastikbiswas/' },
+  { icon: SiX, label: 'X', href: 'https://x.com/0xSwastikBiswas' },
+]
+
 function ContactSection() {
   return (
     <section className="section contact-section">
@@ -865,6 +882,22 @@ function ContactSection() {
               >
                 <link.icon size={20} aria-hidden="true" />
                 <span>{link.label}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <ul className="social-list" aria-label="Social profiles">
+          {socialLinks.map((s) => (
+            <li key={s.href}>
+              <a
+                className="social-link"
+                href={s.href}
+                target="_blank"
+                rel="noreferrer noopener"
+                aria-label={s.label}
+                title={s.label}
+              >
+                <s.icon size={20} aria-hidden="true" />
               </a>
             </li>
           ))}
